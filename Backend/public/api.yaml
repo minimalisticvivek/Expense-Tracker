@@ -1,0 +1,102 @@
+swagger: "2.0"
+info:
+  title: Expense Tracker API
+  description: REST API endpoints for Expense Tracker App
+  version: 0.0.1
+
+host: localhost
+basePath: :4000
+schemes:
+  - http
+
+paths:
+  /users:
+    post:
+      tags:
+        - Auth
+      summary: Sign Up User.
+      operationId: signup
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: form
+          description: The sign up form values
+          schema:
+            $ref: "#/definitions/SignUp"
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: "#/definitions/SignUpResponse"
+
+  /users/{creds}:
+    get:
+      tags:
+        - Auth
+      summary: Sign In User.
+      operationId: signin
+      parameters:
+        - in: path
+          name: creds
+          description: Email ID and Password of the user.
+          schema:
+            $ref: "#/definitions/SignIn"
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/SignInResponse"
+
+definitions:
+  SignUp: # Schema name
+    type: object
+    required:
+      - name
+      - email
+      - password
+      - isPremium
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+      isPremium:
+        type: boolean
+
+  SignUpResponse:
+    type: object
+    properties:
+      _id:
+        type: string
+        example: 636739d71c73f81f920c457b
+      name:
+        type: string
+        example: Vivek Singh
+      email:
+        type: string
+        example: rogerthatvivek@gmail.com
+      password:
+        type: string
+        example: $2b$10$ftHaOTC.eAxU7FNdF1d8i.ng/yJ.yypfUEClFTUR1cYKt29SJCzbm
+      isPremium:
+        type: boolean
+      __v:
+        type: integer
+
+  SignIn:
+    type: string
+    required: true
+    example: '{"email":"rogerthatvivek@gmail.com","password":"12345"}'
+
+  SignInResponse:
+    type: object
+    properties:
+      code:
+        type: integer
+        example: 1
+      token:
+        type: string
+        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJvZ2VydGhhdHZpdmVrQGdtYWlsLmNvbSIsImlhdCI6MTY2OTM2MTQ1MH0.dkpXdtS--dP6j11GpUZ5lFDUXuiI6MBH2jMAYzy2vGs
