@@ -9,8 +9,45 @@ basePath: :4000
 schemes:
   - http
 
+securityDefinitions:
+  APIKeyHeader:
+    type: apiKey
+    in: header
+    name: Authorization
+
 paths:
   /users:
+    get:
+      security:
+        - APIKeyHeader: []
+      tags:
+        - Expenses
+      summary: Returns whether the user is a premium user or not (boolean).
+      operationId: checkpremium
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/CheckPremiumResponse"
+        "401":
+          description: "Error: Unauthorized \nInvalid or missing JWT Token"
+
+    put:
+      security:
+        - APIKeyHeader: []
+      tags:
+        - Expenses
+      summary: Changes the user type to a premium user.
+      operationId: updatetopremium
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: boolean
+            example: true
+        "401":
+          description: "Error: Unauthorized \nInvalid or missing JWT Token"
+
     post:
       tags:
         - Auth
@@ -47,6 +84,200 @@ paths:
           description: OK
           schema:
             $ref: "#/definitions/SignInResponse"
+
+  /forgotpassword/{email}:
+    get:
+      tags:
+        - Auth
+      summary: Send Reset Password Email.
+      operationId: forgotpassword
+      parameters:
+        - in: path
+          name: email
+          description: Email ID of the user to send the reset password link.
+          schema:
+            type: string
+            example: test@email.com
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/ForgotPasswordResponse"
+
+  /expenses/{id}:
+    get:
+      tags:
+        - Expenses
+      summary: Returns a single expense object with the id passed into the request.
+      operationId: getexpense
+      parameters:
+        - in: path
+          name: id
+          description: ID of the expense which you want to fetch from the Expenses Data.
+          schema:
+            type: string
+            example: "6367412a08d59c1814b0a9ba"
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/Expenses"
+
+  /expensesData/{pageNo}:
+    get:
+      security:
+        - APIKeyHeader: []
+      tags:
+        - Expenses
+      summary: Show Paginated Expenses For The User.
+      operationId: getexpenses
+      parameters:
+        - in: path
+          name: pageNo
+          description: Page No of which you want to fetch Expenses
+          schema:
+            $ref: "#/definitions/GetExpenses"
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/GetExpensesData"
+        "401":
+          description: "Error: Unauthorized \nInvalid or missing JWT Token"
+
+  /expensesData:
+    post:
+      security:
+        - APIKeyHeader: []
+      tags:
+        - Expenses
+      summary: Add Expense For The User.
+      operationId: addexpense
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: expense
+          description: Expense Data which is to be added for the user.
+          schema:
+            $ref: "#/definitions/Expense"
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: "#/definitions/Expenses"
+        "401":
+          description: "Error: Unauthorized \nInvalid or missing JWT Token"
+
+  /expensesData/{id}:
+    put:
+      tags:
+        - Expenses
+      summary: Edit Expense For The User.
+      operationId: editexpense
+      consumes:
+        - application/json
+      parameters:
+        - in: path
+          name: id
+          description: ID of the Expense Data which is to be edited for the user.
+          schema:
+            type: string
+            required: true
+            example: "6367412a08d59c1814b0a9ba"
+        - in: body
+          name: expense
+          description: Expense Data which is to be updated for the user.
+          schema:
+            $ref: "#/definitions/Expense"
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/Expenses"
+    delete:
+      tags:
+        - Expenses
+      summary: Delete Expense For The User.
+      operationId: deleteexpense
+      parameters:
+        - in: path
+          name: id
+          description: ID of the Expense Data which is to be deleted for the user.
+          schema:
+            type: string
+            required: true
+            example: "63845b3d3ed429b0071c5cc4"
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/Expenses"
+
+  /pages/{pages}:
+    get:
+      tags:
+        - Expenses
+      summary: Updates the number of expenses you can see on the Dashboard.
+      operationId: updateitemsperpage
+      parameters:
+        - in: path
+          name: pages
+          description: No of items to see per page.
+          schema:
+            type: string
+            required: true
+            example: "3"
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/DynamicPaginationResponse"
+
+  /download:
+    get:
+      security:
+        - APIKeyHeader: []
+      tags:
+        - Expenses
+      summary: Returns a downloadable file link with Expenses of the User.
+      operationId: downloadexpenses
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+            example: "https://expense-tracker-aws.s3.amazonaws.com/Expense636739d71c73f81f920c457b/Tue%20Nov%2029%202022%2014%3A08%3A39%20GMT%2B0530%20%28India%20Standard%20Time%29.txt"
+        "401":
+          description: "Error: Unauthorized \nInvalid or missing JWT Token"
+
+  /downloadHistory:
+    get:
+      security:
+        - APIKeyHeader: []
+      tags:
+        - Expenses
+      summary: Returns history of downloads performed by the user with the downloadable file link.
+      operationId: downloadhistory
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/DownloadHistory"
+        "401":
+          description: "Error: Unauthorized \nInvalid or missing JWT Token"
+
+  /leaderboard:
+    get:
+      tags:
+        - Expenses
+      summary: Returns list of users with their expenses as an array response.
+      operationId: showleaderboard
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: "#/definitions/Leaderboard"
 
 definitions:
   SignUp: # Schema name
@@ -86,6 +317,16 @@ definitions:
       __v:
         type: integer
 
+  ForgotPasswordResponse:
+    type: object
+    properties:
+      info:
+        type: string
+        example: "250 2.0.0 OK  1669717779 y1-20020a17090abd0100b0021885b05660sm1037663pjr.24 - gsmtp"
+      sent:
+        type: boolean
+        example: true
+
   SignIn:
     type: string
     required: true
@@ -100,3 +341,126 @@ definitions:
       token:
         type: string
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InJvZ2VydGhhdHZpdmVrQGdtYWlsLmNvbSIsImlhdCI6MTY2OTM2MTQ1MH0.dkpXdtS--dP6j11GpUZ5lFDUXuiI6MBH2jMAYzy2vGs
+
+  CheckPremiumResponse:
+    type: object
+    properties:
+      isPremium:
+        type: boolean
+        example: true
+
+  Expense:
+    type: object
+    properties:
+      amount:
+        type: number
+        example: 1000
+      desc:
+        type: string
+        example: "Jimi's Burger"
+      catg:
+        type: string
+        example: Food Order
+
+  Expenses:
+    type: object
+    properties:
+      _id:
+        type: string
+      amount:
+        type: number
+      desc:
+        type: string
+      catg:
+        type: string
+      userId:
+        type: string
+      __v:
+        type: integer
+
+  GetExpenses:
+    type: integer
+    required: false
+    example: 1
+
+  GetExpensesData:
+    type: object
+    properties:
+      response:
+        type: array
+        expenses:
+          $ref: "#/definitions/Expenses"
+        example:
+          [
+            {
+              _id: "6367412a08d59c1814b0a9ba",
+              amount: 1000,
+              desc: "Dominos",
+              catg: "Food Order",
+              userId: 1,
+              __v: 0,
+            },
+          ]
+      currentPage:
+        type: integer
+      hasNextPage:
+        type: boolean
+      hasPreviousPage:
+        type: boolean
+      nextPage:
+        type: integer
+      previousPage:
+        type: integer
+      positive:
+        type: number
+      negative:
+        type: number
+      lastPage:
+        type: integer
+      totalItems:
+        type: integer
+
+  DynamicPaginationResponse:
+    type: object
+    properties:
+      updated:
+        type: boolean
+        example: true
+
+  History:
+    type: object
+    properties:
+      _id:
+        type: string
+      link:
+        type: string
+      userId:
+        type: string
+      __v:
+        type: number
+
+  DownloadHistory:
+    type: array
+    history:
+      $ref: "#/definitions/History"
+    example: [{ _id: "string", link: "string", userId: "string", __v: 0 }]
+
+  Leaderboard:
+    type: object
+    properties:
+      users:
+        type: array
+        example: [{ id: "string", name: "Vivek" }]
+      expenses:
+        type: array
+        example:
+          [
+            {
+              _id: "string",
+              amount: 45833,
+              desc: "string",
+              catg: "string",
+              userId: "string",
+              __v: 0,
+            },
+          ]

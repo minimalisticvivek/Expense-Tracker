@@ -1,38 +1,69 @@
-<body>
+<body [ngClass]="isPremium ? 'dark' : ''">
   <fa-icon
     id="logout"
+    [ngClass]="isPremium ? 'shift' : 'default'"
     (click)="logout()"
     [icon]="['fas', 'arrow-right-from-bracket']"
   ></fa-icon>
-  <div class="row">
+  <div class="card-row">
     <!-- Left Column For Managing Expenses -->
     <div class="column left">
-      <button id="premium">Buy Premium</button>
+      <button id="premium" [ngClass]="isPremium ? 'hidden' : ''">
+        Buy Premium
+      </button>
       <h2>Expense Tracker</h2>
       <div class="container">
-        <div class="inc-exp-container">
+        <div
+          [ngClass]="isPremium ? 'inc-exp-container dark' : 'inc-exp-container'"
+        >
           <div>
             <h4>Total Income</h4>
-            <p id="money-plus" class="money plus">₹0.00</p>
+            <p id="money-plus" class="money plus">{{ totalInflow }}</p>
           </div>
           <div>
             <h4>Total Expense</h4>
-            <p id="money-minus" class="money minus">₹0.00</p>
+            <p id="money-minus" class="money minus">{{ totalOutflow }}</p>
           </div>
         </div>
-        <div class="row-container">
-          <form id="form" class="row-container">
-            <div class="form-control">
+        <form
+          #Expense="ngForm"
+          id="form"
+          (ngSubmit)="editingMode !== true ? addExpense() : modifyExpense()"
+        >
+          <div class="row justify-content-center">
+            <div class="form-group col-sm-auto">
               <label for="amount">Amount</label>
-              <input type="number" id="amount" placeholder="₹" />
+              <input
+                [(ngModel)]="this.expenseBody.amount"
+                type="number"
+                id="amount"
+                placeholder="₹"
+                name="amount"
+                [ngClass]="isPremium ? 'dark' : 'form-control'"
+              />
             </div>
-            <div class="form-control">
+            <div class="form-group col-sm-auto">
               <label for="text">Description</label>
-              <input type="text" id="desc" placeholder="" />
+              <input
+                [(ngModel)]="this.expenseBody.desc"
+                type="text"
+                id="desc"
+                placeholder=""
+                name="desc"
+                [ngClass]="isPremium ? 'dark' : 'form-control'"
+              />
             </div>
-            <div class="form-control">
+            <div class="form-group col-sm-auto">
               <label for="text">Category</label>
-              <input type="text" list="type" id="catg" placeholder="Select" />
+              <input
+                [(ngModel)]="this.expenseBody.catg"
+                type="text"
+                list="type"
+                id="catg"
+                name="catg"
+                [ngClass]="isPremium ? 'dark' : 'form-control'"
+                placeholder="Select"
+              />
             </div>
             <datalist id="type">
               <option value="Movie"></option>
@@ -41,10 +72,14 @@
               <option value="Bill"></option>
               <option value="EMI"></option>
             </datalist>
-
-            <button id="addBtn" class="btn">Add Expense</button>
-          </form>
-        </div>
+            <div class="col-sm-auto">
+              <button id="addBtn" class="btn text-nowrap" type="submit">
+                {{ this.editingMode ? "Modify Expense" : "Add Expense" }}
+              </button>
+            </div>
+            <!---col-->
+          </div>
+        </form>
 
         <div id="history-container" class="popup-container">
           <div class="popup">
@@ -57,15 +92,93 @@
         </div>
 
         <h3>
-          History <i id="downloadBtn" class="fa-solid fa-cloud-arrow-down"></i
-          ><i id="historyBtn" class="fa-solid fa-clock-rotate-left"></i>
+          History
+          <fa-icon
+            id="downloadBtn"
+            class="fa-solid fa-cloud-arrow-down"
+            [icon]="['fas', 'cloud-arrow-down']"
+          ></fa-icon
+          ><fa-icon
+            id="historyBtn"
+            class="fa-solid fa-clock-rotate-left"
+            [icon]="['fas', 'clock-rotate-left']"
+          ></fa-icon>
         </h3>
-        <ul id="list" class="list"></ul>
+        <ul id="list" class="list">
+          <li
+            *ngFor="let expense of expensesData"
+            [ngClass]="
+              expense.amount > 0
+                ? isPremium
+                  ? 'plus dark'
+                  : 'plus'
+                : isPremium
+                ? 'minus dark'
+                : 'minus'
+            "
+          >
+            <button
+              class="delete-btn"
+              (click)="deleteExpenseHandler(expense._id)"
+            >
+              <fa-icon
+                style="font-size: 22px"
+                class="fas"
+                aria-hidden="true"
+                [icon]="['fas', 'trash']"
+              ></fa-icon>
+            </button>
+            {{
+              expense.amount > 0
+                ? "+₹" + (expense.amount * 1).toLocaleString("en-IN")
+                : "-₹" + (expense.amount * -1).toLocaleString("en-IN")
+            }}
+            <span>{{ expense.desc }}</span>
+            {{ expense.catg }}
+            <button class="edit-btn" (click)="editExpenseHandler(expense._id)">
+              <fa-icon
+                id="{{ expense._id }}"
+                style="font-size: 24px"
+                class="far"
+                aria-hidden="true"
+                [icon]="['fas', 'pen-to-square']"
+              ></fa-icon>
+            </button>
+          </li>
+        </ul>
 
-        <div class="pages-container"></div>
+        <div *ngIf="pages > 1; else elseBlock" class="pages-container">
+          <button *ngIf="currentPage > 2" (click)="loadPageHandler(1)">
+            {{ 1 }}
+          </button>
+          <button *ngIf="currentPage > 1" (click)="loadPageHandler(prevPage)">
+            {{ prevPage }}
+          </button>
+          <button>{{ currentPage }}</button>
+          <button
+            *ngIf="currentPage !== lastPage"
+            (click)="loadPageHandler(nextPage)"
+          >
+            {{ nextPage }}
+          </button>
+          <button
+            *ngIf="
+              nextPage !== lastPage && currentPage !== lastPage && lastPage > 2
+            "
+            (click)="loadPageHandler(lastPage)"
+          >
+            {{ lastPage }}
+          </button>
+        </div>
+        <ng-template #elseBlock class="pages-container"> </ng-template>
+
         <div class="rows">
           <p>Records per page:</p>
-          <select name="records" id="rows">
+          <select
+            name="records"
+            [ngClass]="isPremium ? 'dark-rec' : ''"
+            (change)="paginationHandler($event)"
+          >
             <option value="3">3</option>
             <option value="5">5</option>
             <option value="10">10</option>
@@ -79,10 +192,15 @@
       </div>
     </div>
     <!-- Right Column For Leaderboard -->
-    <div class="column right">
+    <div [ngClass]="isPremium ? 'column right show' : 'column right'">
       <h2>Leaderboard</h2>
       <div class="users">
-        <ul class="users-list"></ul>
+        <ul class="users-list">
+          <li *ngFor="let user of leaderboard">
+            <p>{{ user.name }}</p>
+            <p>₹ {{ user.expense.toLocaleString("en-IN") }}</p>
+          </li>
+        </ul>
       </div>
     </div>
   </div>

@@ -17,6 +17,7 @@ import { CustomHttpUrlEncodingCodec }                        from '../encoder';
 
 import { Observable }                                        from 'rxjs';
 
+import { ForgotPasswordResponse } from '../model/forgotPasswordResponse';
 import { SignInResponse } from '../model/signInResponse';
 import { SignUp } from '../model/signUp';
 import { SignUpResponse } from '../model/signUpResponse';
@@ -58,6 +59,47 @@ export class AuthService {
         return false;
     }
 
+
+    /**
+     * Send Reset Password Email.
+     * 
+     * @param email Email ID of the user to send the reset password link.
+     * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+     * @param reportProgress flag to report request and response progress.
+     */
+    public forgotpassword(email: any, observe?: 'body', reportProgress?: boolean): Observable<ForgotPasswordResponse>;
+    public forgotpassword(email: any, observe?: 'response', reportProgress?: boolean): Observable<HttpResponse<ForgotPasswordResponse>>;
+    public forgotpassword(email: any, observe?: 'events', reportProgress?: boolean): Observable<HttpEvent<ForgotPasswordResponse>>;
+    public forgotpassword(email: any, observe: any = 'body', reportProgress: boolean = false ): Observable<any> {
+
+        if (email === null || email === undefined) {
+            throw new Error('Required parameter email was null or undefined when calling forgotpassword.');
+        }
+
+        let headers = this.defaultHeaders;
+
+        // to determine the Accept header
+        let httpHeaderAccepts: string[] = [
+            '*/*'
+        ];
+        const httpHeaderAcceptSelected: string | undefined = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+        if (httpHeaderAcceptSelected != undefined) {
+            headers = headers.set('Accept', httpHeaderAcceptSelected);
+        }
+
+        // to determine the Content-Type header
+        const consumes: string[] = [
+        ];
+
+        return this.httpClient.request<ForgotPasswordResponse>('get',`${this.basePath}/forgotpassword/${encodeURIComponent(String(email))}`,
+            {
+                withCredentials: this.configuration.withCredentials,
+                headers: headers,
+                observe: observe,
+                reportProgress: reportProgress
+            }
+        );
+    }
 
     /**
      * Sign In User.

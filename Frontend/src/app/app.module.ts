@@ -7,15 +7,22 @@ import {
   FontAwesomeModule,
   FaIconLibrary,
 } from '@fortawesome/angular-fontawesome';
-import { faArrowRightFromBracket } from '@fortawesome/free-solid-svg-icons';
+import {
+  faArrowRightFromBracket,
+  faPenToSquare,
+  faTrash,
+  faCloudArrowDown,
+  faClockRotateLeft,
+} from '@fortawesome/free-solid-svg-icons';
 import { AuthComponent } from './auth/auth.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ApiModule } from 'src/swagger';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { PricingComponent } from './pricing/pricing.component';
 
 @NgModule({
-  declarations: [AppComponent, AuthComponent, DashboardComponent],
+  declarations: [AppComponent, AuthComponent, DashboardComponent, PricingComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -30,6 +37,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 })
 export class AppModule {
   constructor(library: FaIconLibrary) {
-    library.addIcons(faArrowRightFromBracket);
+    library.addIcons(
+      faArrowRightFromBracket,
+      faPenToSquare,
+      faTrash,
+      faCloudArrowDown,
+      faClockRotateLeft
+    );
   }
 }

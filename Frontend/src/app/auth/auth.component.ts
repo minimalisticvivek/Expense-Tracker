@@ -1,13 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService, SignIn, SignUp } from 'src/swagger';
+import { AuthService, SignIn, SignUp, ExpensesService } from 'src/swagger';
 
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.component.html',
   styleUrls: ['./auth.component.css'],
 })
-export class AuthComponent {
+export class AuthComponent implements OnInit {
   public signupBody: SignUp = {
     name: '',
     email: '',
@@ -22,6 +22,11 @@ export class AuthComponent {
 
   constructor(private router: Router, private authService: AuthService) {}
 
+  ngOnInit(): void {
+    sessionStorage.getItem('token') !== null
+      ? this.router.navigateByUrl('/dashboard')
+      : null;
+  }
   // Sign Up Button Handler
   async signUpUser(): Promise<any> {
     if (this.signupBody.email.indexOf('@') == -1) {
@@ -30,7 +35,13 @@ export class AuthComponent {
     }
     this.authService.signup(this.signupBody).subscribe(
       (response) => {
-        console.log(response);
+        if (Array.isArray(response)) {
+          alert('You already have an account with us! Please Sign In...');
+          this.switchForm();
+        } else {
+          alert('Sign Up Successful! Please Sign In...');
+          this.switchForm();
+        }
       },
       (err) => {
         console.log(err);
