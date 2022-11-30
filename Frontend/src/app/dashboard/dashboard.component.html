@@ -8,7 +8,11 @@
   <div class="card-row">
     <!-- Left Column For Managing Expenses -->
     <div class="column left">
-      <button id="premium" [ngClass]="isPremium ? 'hidden' : ''">
+      <button
+        id="premium"
+        [ngClass]="isPremium ? 'hidden' : ''"
+        routerLink="/pricing"
+      >
         Buy Premium
       </button>
       <h2>Expense Tracker</h2>
@@ -81,12 +85,17 @@
           </div>
         </form>
 
-        <div id="history-container" class="popup-container">
+        <div
+          id="history-container"
+          [ngClass]="historyMode ? 'popup-container active' : 'popup-container'"
+        >
           <div class="popup">
-            <button id="close">x</button>
+            <button id="close" (click)="downloadHistoryHandler()">x</button>
             <h1>Download History</h1>
             <ul id="download-history">
-              <!-- <li><p>No Downloads Yet</p></li> -->
+              <li *ngFor="let item of downloadHistory; index as i">
+                <a [href]="item.link">Expense {{ i + 1 }}</a>
+              </li>
             </ul>
           </div>
         </div>
@@ -95,13 +104,15 @@
           History
           <fa-icon
             id="downloadBtn"
-            class="fa-solid fa-cloud-arrow-down"
+            [ngClass]="isPremium ? 'showIcon' : 'hidden'"
             [icon]="['fas', 'cloud-arrow-down']"
+            (click)="downloadHandler()"
           ></fa-icon
           ><fa-icon
             id="historyBtn"
-            class="fa-solid fa-clock-rotate-left"
+            [ngClass]="isPremium ? 'showIcon' : 'hidden'"
             [icon]="['fas', 'clock-rotate-left']"
+            (click)="downloadHistoryHandler()"
           ></fa-icon>
         </h3>
         <ul id="list" class="list">

@@ -219,7 +219,7 @@ select {
 }
 
 #downloadBtn {
-  display: none;
+  /* display: none; */
   margin: 0 1rem;
   cursor: pointer;
   transition: font-size 0.1s linear;
@@ -231,7 +231,7 @@ select {
 }
 
 #historyBtn {
-  display: none;
+  /* display: none; */
   margin: 0 0.5rem;
   cursor: pointer;
   transition: font-size 0.1s linear;
@@ -528,4 +528,8 @@ h2 {
 
 .default {
   right: 0.5rem;
+}
+
+.showIcon {
+  display: inline-block;
 }

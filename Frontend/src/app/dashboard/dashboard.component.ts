@@ -19,6 +19,8 @@ export class DashboardComponent implements OnInit {
     desc: '',
     catg: '',
   };
+  historyMode: boolean = false;
+  downloadHistory: any = [];
   leaderboard: any = [];
   isPremium: boolean = false;
   editingMode: boolean = false;
@@ -75,9 +77,10 @@ export class DashboardComponent implements OnInit {
             'en-IN'
           )) as String;
         this.totalOutflow = ('-₹' +
-          ((response.negative as number) * -1)?.toLocaleString(
-            'en-IN'
-          )) as String;
+          ((response.negative as number) == 0
+            ? (response.negative as number) * 1
+            : (response.negative as number) * -1
+          )?.toLocaleString('en-IN')) as String;
       },
       (err) => {
         console.log(err);
@@ -159,6 +162,27 @@ export class DashboardComponent implements OnInit {
       (err) => {
         console.log(err);
       }
+    );
+  }
+  downloadHandler() {
+    this.expensesService.downloadexpenses().subscribe(
+      (response) => {
+        console.log((response as any).text);
+      },
+      (err) => {
+        console.log(err.error.text);
+        window.location.href = err.error.text;
+      }
+    );
+  }
+  downloadHistoryHandler() {
+    this.historyMode = !this.historyMode;
+    this.expensesService.downloadhistory().subscribe(
+      (response) => {
+        this.downloadHistory = response;
+        console.log(this.downloadHistory);
+      },
+      (err) => console.log(err)
     );
   }
   logout() {

@@ -1,5 +1,6 @@
 section.pricing {
   height: 100vh;
+  width: 100vw;
   background: #1b212c;
   background: linear-gradient(to right, #ecf0f3, #f9f9f9);
   text-align: center;

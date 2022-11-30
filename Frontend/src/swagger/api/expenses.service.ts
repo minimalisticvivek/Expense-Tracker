@@ -37,7 +37,7 @@ import { Configuration } from '../configuration';
   providedIn: 'root',
 })
 export class ExpensesService {
-  protected basePath = 'http://localhost:4000';
+  protected basePath = 'https://expense-tracker-nodejs-app.herokuapp.com';
   public defaultHeaders = new HttpHeaders();
   public configuration = new Configuration();
 
@@ -303,6 +303,10 @@ export class ExpensesService {
       this.configuration.selectHeaderAccept(httpHeaderAccepts);
     if (httpHeaderAcceptSelected != undefined) {
       headers = headers.set('Accept', httpHeaderAcceptSelected);
+      headers = headers.set(
+        'Authorization',
+        sessionStorage.getItem('token') as string
+      );
     }
 
     // to determine the Content-Type header
@@ -357,6 +361,10 @@ export class ExpensesService {
       this.configuration.selectHeaderAccept(httpHeaderAccepts);
     if (httpHeaderAcceptSelected != undefined) {
       headers = headers.set('Accept', httpHeaderAcceptSelected);
+      headers = headers.set(
+        'Authorization',
+        sessionStorage.getItem('token') as string
+      );
     }
 
     // to determine the Content-Type header
@@ -720,6 +728,10 @@ export class ExpensesService {
       this.configuration.selectHeaderAccept(httpHeaderAccepts);
     if (httpHeaderAcceptSelected != undefined) {
       headers = headers.set('Accept', httpHeaderAcceptSelected);
+      headers = headers.set(
+        'Authorization',
+        sessionStorage.getItem('token') as string
+      );
     }
 
     // to determine the Content-Type header
